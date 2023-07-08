@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	version = "0.0.3"
+	version = "0.0.4"
 )
 
 func main() {
@@ -46,7 +46,12 @@ func main() {
 	fmt.Println("Title:", metadata.Livestream.SessionTitle)
 	fmt.Println()
 
-	DownloadM3U8(metadata)
+	downloadSegments(metadata)
+	err = mergeSegments(metadata.Livestream.Slug)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	fmt.Println("Done")
 }

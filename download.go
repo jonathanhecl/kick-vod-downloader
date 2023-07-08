@@ -89,7 +89,7 @@ func decodeMediaPlaylist(content string) *m3u8.MediaPlaylist {
 	return p.(*m3u8.MediaPlaylist)
 }
 
-func DownloadM3U8(metadata KickMetadataResponse) {
+func downloadSegments(metadata KickMetadataResponse) {
 	fmt.Println("- Downloading M3U8 Master Playlist")
 
 	content := getURLContent(metadata.Source)

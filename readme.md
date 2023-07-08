@@ -10,8 +10,8 @@ _TODO list:_
 - [x] Parse M3U8 Master Playlist
 - [x] Parse M3U8 Video Playlist
 - [x] Download the video segments
-- [ ] Merge the video segments
-
+- [x] Merge the video segments
+- [ ] Convert the video to mp4
 ---
 
 ## How to use
