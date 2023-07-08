@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"regexp"
 
@@ -37,13 +36,13 @@ func getMetadataFromKickURL(videoID string) (KickMetadataResponse, error) {
 
 	rep, err := client.Get(url)
 	if err != nil {
-		log.Fatal(err)
+		return KickMetadataResponse{}, err
 	}
 
 	body, err := io.ReadAll(rep.Body)
 	rep.Body.Close()
 	if err != nil {
-		log.Fatal(err)
+		return KickMetadataResponse{}, err
 	}
 
 	err = json.Unmarshal(body, &res)

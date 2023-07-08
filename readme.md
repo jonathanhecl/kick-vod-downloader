@@ -1,6 +1,12 @@
-## Kick VOD Downloader (WIP)
+## Kick VOD Downloader
 
 This is a tool to download the VOD from kick.com
+
+---
+
+Requirements:
+
+- FFmpeg (https://ffmpeg.org/download.html)
 
 ---
 
@@ -11,7 +17,7 @@ _TODO list:_
 - [x] Parse M3U8 Video Playlist
 - [x] Download the video segments
 - [x] Merge the video segments
-- [ ] Convert the video to mp4
+- [x] Convert the video to mp4
 ---
 
 ## How to use
@@ -23,9 +29,19 @@ __Or__
 
 3. Enter the kick url like https://www.kick.com/video/d5843b1c-70d8-426c-bdaf-d69e6d90b80c in the console
 
+---
+
+![Image](terminal.png)
 
 ---
 
 ## How to build
 
 > go build -o kick-vod-downloader.exe
+> 
+
+---
+
+## Curiosity
+
+This project was made in 5 hours, so it's not perfect, but it works.

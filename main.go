@@ -2,16 +2,19 @@ package main
 
 import (
 	"fmt"
+	"github.com/jonathanhecl/gotimeleft"
 	"os"
 )
 
 var (
-	version = "0.0.4"
+	version = "0.1.5"
 )
 
 func main() {
 	fmt.Println("Kick VOD Downloader v" + version)
 	fmt.Println()
+
+	timeleft := gotimeleft.Init(5)
 
 	fmt.Println("This tool is for educational purpose only.")
 	fmt.Println("Do not use this tool to download videos without permission from the owner.")
@@ -36,22 +39,43 @@ func main() {
 		return
 	}
 
+	timeleft.Step(1)
+
 	metadata, err := getMetadataFromKickURL(videoID)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
+	timeleft.Step(2)
+
 	fmt.Println()
 	fmt.Println("Title:", metadata.Livestream.SessionTitle)
 	fmt.Println()
 
-	downloadSegments(metadata)
+	err = downloadSegments(metadata)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	timeleft.Step(3)
+
 	err = mergeSegments(metadata.Livestream.Slug)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	fmt.Println("Done")
+	timeleft.Step(4)
+
+	err = convertVideo(metadata.Livestream.Slug)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	timeleft.Step(5)
+
+	fmt.Println("Done in", timeleft.GetTimeSpent())
 }

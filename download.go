@@ -3,8 +3,8 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"github.com/jonathanhecl/gotimeleft"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -15,50 +15,52 @@ import (
 	"github.com/grafov/m3u8"
 )
 
-func getURLContent(url string) string {
+func getURLContent(url string) (string, error) {
 	client := &http.Client{}
 	client.Transport = cloudflarebp.AddCloudFlareByPass(client.Transport)
 
 	rep, err := client.Get(url)
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
 	body, err := io.ReadAll(rep.Body)
 	rep.Body.Close()
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
-	return string(body)
+	return string(body), nil
 }
 
-func downloadUrlSegment(url string, pathDest string) {
+func downloadUrlSegment(url string, pathDest string) error {
 	filename := path.Base(url)
 	filePath := path.Join(pathDest, filename)
 	if _, err := os.Stat(filePath); err == nil {
-		return
+		return nil
 	}
 
-	fmt.Println("Downloading", url)
+	//fmt.Println("- Downloading", url)
 
 	client := &http.Client{}
 	client.Transport = cloudflarebp.AddCloudFlareByPass(client.Transport)
 
 	rep, err := client.Get(url)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	file, err := os.Create(filePath)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer file.Close()
 
 	_, err = io.Copy(file, rep.Body)
 	if err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }
 
 func decodeMasterPlaylist(content string) *m3u8.MasterPlaylist {
@@ -89,17 +91,25 @@ func decodeMediaPlaylist(content string) *m3u8.MediaPlaylist {
 	return p.(*m3u8.MediaPlaylist)
 }
 
-func downloadSegments(metadata KickMetadataResponse) {
+func downloadSegments(metadata KickMetadataResponse) error {
 	fmt.Println("- Downloading M3U8 Master Playlist")
 
-	content := getURLContent(metadata.Source)
+	content, err := getURLContent(metadata.Source)
+	if err != nil {
+		return err
+	}
+
 	masterpl := decodeMasterPlaylist(content)
 
 	urlVideo := fmt.Sprintf("%s/%s", getBaseUrl(metadata.Source), masterpl.Variants[0].URI)
 
 	fmt.Println("- Downloading M3U8 Video Playlist")
 
-	contentVideo := getURLContent(urlVideo)
+	contentVideo, err := getURLContent(urlVideo)
+	if err != nil {
+		return err
+	}
+
 	videopl := decodeMediaPlaylist(contentVideo)
 
 	if _, err := os.Stat(metadata.Livestream.Slug); os.IsNotExist(err) {
@@ -107,16 +117,22 @@ func downloadSegments(metadata KickMetadataResponse) {
 	}
 
 	var maxConcurrentDownloads = 16
+	var downloadCounter int = 0
 	var wg sync.WaitGroup
 	var sem = make(chan struct{}, maxConcurrentDownloads)
 
-	//var totalSegments int
-	//for _, segment := range videopl.Segments {
-	//	if segment == nil {
-	//		continue
-	//	}
-	//	totalSegments++
-	//}
+	var totalSegments int
+	for _, segment := range videopl.Segments {
+		if segment == nil {
+			continue
+		}
+		totalSegments++
+	}
+
+	fmt.Printf("- Downloading %d segments\n", totalSegments)
+	fmt.Println("- Please wait...")
+
+	timeleft := gotimeleft.Init(totalSegments)
 
 	for _, segment := range videopl.Segments {
 		if segment == nil {
@@ -128,14 +144,27 @@ func downloadSegments(metadata KickMetadataResponse) {
 		go func(segment *m3u8.MediaSegment) {
 			defer func() {
 				wg.Done()
+				timeleft.Value(downloadCounter)
+
+				if downloadCounter%9 == 0 {
+					fmt.Printf("%s %s - %s\n", timeleft.GetProgressBar(30), timeleft.GetProgressValues(), timeleft.GetProgress(1))
+				}
 			}()
 
 			urlSegment := fmt.Sprintf("%s/%s", getBaseUrl(urlVideo), segment.URI)
-			downloadUrlSegment(urlSegment, metadata.Livestream.Slug)
+			err := downloadUrlSegment(urlSegment, metadata.Livestream.Slug)
+			if err != nil {
+				panic(err)
+			}
+			downloadCounter++
 			<-sem
 		}(segment)
 	}
 	wg.Wait()
+
+	fmt.Printf("- Downloaded %d segments\n", totalSegments)
+
+	return nil
 }
 
 func getBaseUrl(fullUrl string) string {

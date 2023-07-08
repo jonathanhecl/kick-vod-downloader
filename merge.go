@@ -26,15 +26,16 @@ func mergeSegments(slug string) error {
 	if _, err := os.Stat(mergeFile); err == nil {
 		err := os.Remove(mergeFile)
 		if err != nil {
-			panic(err)
+			return err
 		}
 	}
 
 	fmt.Println("- Merging ", slug)
+	fmt.Println("- Please wait...")
 
 	file, err := os.Create(mergeFile)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer file.Close()
 
@@ -46,22 +47,23 @@ func mergeSegments(slug string) error {
 			break
 		}
 
-		fmt.Printf("%s Time left: %s - %s - %s - Speed: %.2f/s\n", timeleft.GetProgressBar(30), timeleft.GetTimeLeft().String(), timeleft.GetProgressValues(), timeleft.GetProgress(1), timeleft.GetPerSecond())
+		if i%49 == 0 {
+			fmt.Printf("%s %s - %s\n", timeleft.GetProgressBar(30), timeleft.GetProgressValues(), timeleft.GetProgress(1))
+		}
 
 		timeleft.Step(1)
 
 		segFile, err := os.Open(filePath)
 		if err != nil {
-			panic(err)
+			return err
 		}
 
 		_, err = io.Copy(file, segFile)
 		if err != nil {
-			panic(err)
+			return err
 		}
 
 		segFile.Close()
-
 	}
 
 	fmt.Println("- Merged")
@@ -78,11 +80,11 @@ func mergeSegments(slug string) error {
 
 		err := os.Remove(filePath)
 		if err != nil {
-			panic(err)
+			return err
 		}
 	}
 
-	fmt.Println("- Removed")
+	fmt.Println("- Segments removed")
 
 	return nil
 }
