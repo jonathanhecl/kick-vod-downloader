@@ -1,20 +1,32 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 var (
-	version = "0.0.1"
+	version = "0.0.2"
 )
 
 func main() {
 	fmt.Println("Kick VOD Downloader v" + version)
 	fmt.Println()
 
+	fmt.Println("This tool is for educational purpose only.")
+	fmt.Println("Do not use this tool to download videos without permission from the owner.")
+	fmt.Println()
+
+	fmt.Println(os.Args)
 	var url string
-	fmt.Print("Input URL video: ")
-	_, err := fmt.Scanln(&url)
-	if err != nil {
-		return
+	if len(os.Args) == 2 {
+		url = os.Args[1]
+	} else {
+		fmt.Print("Input URL video: ")
+		_, err := fmt.Scanln(&url)
+		if err != nil {
+			return
+		}
 	}
 
 	var videoID string

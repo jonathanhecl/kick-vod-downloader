@@ -42,6 +42,9 @@ func getMetadataFromKickURL(videoID string) (KickResponse, error) {
 	})
 
 	c.OnResponse(func(r *colly.Response) {
+		//fmt.Println("Response received", r.StatusCode)
+		//fmt.Println("Response body", string(r.Body))
+
 		err := json.Unmarshal(r.Body, &res)
 		if err != nil {
 			return
@@ -51,15 +54,13 @@ func getMetadataFromKickURL(videoID string) (KickResponse, error) {
 	})
 
 	c.OnRequest(func(r *colly.Request) {
-		r.Headers.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36")
+		r.Headers.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36")
+		r.Headers.Set("Cache-Control", "no-cache")
+		r.Headers.Set("Accept", "*/*")
+		r.Headers.Set("Connection", "Keep-Alive")
+		r.Headers.Set("Accept-Encoding", "gzip")
+		r.Headers.Set("Host", "kick.com")
 		r.Headers.Set("Referer", "https://kick.com/")
-		r.Headers.Set("Accept-Encoding", "gzip, deflate, br")
-		r.Headers.Set("Accept-Language", "en-US,en;q=0.9,id;q=0.8")
-		r.Headers.Set("Connection", "keep-alive")
-		r.Headers.Set("Sec-Fetch-Dest", "image")
-		r.Headers.Set("Sec-Fetch-Mode", "no-cors")
-		r.Headers.Set("Sec-Fetch-Site", "cross-site")
-		r.Headers.Set("Upgrade-Insecure-Requests", "1")
 	})
 
 	wait.Add(1)
