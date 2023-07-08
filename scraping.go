@@ -3,18 +3,19 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
 	"regexp"
-	"sync"
-	"time"
 
-	"github.com/gocolly/colly"
+	cloudflarebp "github.com/DaRealFreak/cloudflare-bp-go"
 )
 
 type KickResponse struct {
-	Source       string `json:"source"`
-	SessionTitle string `json:"session_title"`
-	Livestream   struct {
-		Slug string `json:"slug"`
+	Source     string `json:"source"`
+	Livestream struct {
+		SessionTitle string `json:"session_title"`
+		Slug         string `json:"slug"`
 	} `json:"livestream"`
 }
 
@@ -28,48 +29,27 @@ func extractVideoID(url string) string {
 }
 
 func getMetadataFromKickURL(videoID string) (KickResponse, error) {
+	var res = KickResponse{}
 	url := fmt.Sprintf("https://kick.com/api/v1/video/%s", videoID)
 
-	var wait sync.WaitGroup
-	var res = KickResponse{}
+	client := &http.Client{}
+	client.Transport = cloudflarebp.AddCloudFlareByPass(client.Transport)
 
-	c := colly.NewCollector()
-	c.SetRequestTimeout(120 * time.Second)
+	rep, err := client.Get(url)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	c.OnError(func(r *colly.Response, err error) {
-		fmt.Println("Request URL:", r.Request.URL, "failed with error:", err)
-		wait.Done()
-	})
+	body, err := io.ReadAll(rep.Body)
+	rep.Body.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	c.OnResponse(func(r *colly.Response) {
-		//fmt.Println("Response received", r.StatusCode)
-		//fmt.Println("Response body", string(r.Body))
-
-		err := json.Unmarshal(r.Body, &res)
-		if err != nil {
-			return
-		}
-
-		wait.Done()
-	})
-
-	c.OnRequest(func(r *colly.Request) {
-		r.Headers.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36")
-		r.Headers.Set("Cache-Control", "no-cache")
-		r.Headers.Set("Accept", "*/*")
-		r.Headers.Set("Connection", "Keep-Alive")
-		r.Headers.Set("Accept-Encoding", "gzip")
-		r.Headers.Set("Host", "kick.com")
-		r.Headers.Set("Referer", "https://kick.com/")
-	})
-
-	wait.Add(1)
-	err := c.Visit(url)
+	err = json.Unmarshal(body, &res)
 	if err != nil {
 		return KickResponse{}, err
 	}
-
-	wait.Wait()
 
 	return res, nil
 }

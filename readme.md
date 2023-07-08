@@ -6,7 +6,7 @@ This is a tool to download the VOD from kick.com
 
 _TODO list:_
 
-- [ ] Get the m3u8 file from kick (cloudflare)
+- [x] Get the m3u8 file from kick (cloudflare)
 - [ ] Download the m3u8 file
 
 ---

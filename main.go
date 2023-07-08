@@ -42,7 +42,7 @@ func main() {
 		return
 	}
 
-	fmt.Println("Title:", metadata.SessionTitle)
+	fmt.Println("Title:", metadata.Livestream.SessionTitle)
 	fmt.Println("M3U8 URL:", metadata.Source)
 	fmt.Println("Slug:", metadata.Livestream.Slug)
 
