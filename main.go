@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	version = "0.0.2"
+	version = "0.0.3"
 )
 
 func main() {
@@ -15,18 +15,18 @@ func main() {
 
 	fmt.Println("This tool is for educational purpose only.")
 	fmt.Println("Do not use this tool to download videos without permission from the owner.")
-	fmt.Println()
 
-	fmt.Println(os.Args)
 	var url string
 	if len(os.Args) == 2 {
 		url = os.Args[1]
 	} else {
+		fmt.Println()
 		fmt.Print("Input URL video: ")
 		_, err := fmt.Scanln(&url)
 		if err != nil {
 			return
 		}
+		fmt.Println()
 	}
 
 	var videoID string
@@ -42,9 +42,11 @@ func main() {
 		return
 	}
 
+	fmt.Println()
 	fmt.Println("Title:", metadata.Livestream.SessionTitle)
-	fmt.Println("M3U8 URL:", metadata.Source)
-	fmt.Println("Slug:", metadata.Livestream.Slug)
+	fmt.Println()
 
-	// TODO: Download m3u8 file
+	DownloadM3U8(metadata)
+
+	fmt.Println("Done")
 }

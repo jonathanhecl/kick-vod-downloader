@@ -16,6 +16,8 @@ require (
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.3.1 // indirect
+	github.com/grafov/m3u8 v0.12.0 // indirect
+	github.com/jonathanhecl/gotimeleft v0.0.0-20221223035623-e4199f419e55 // indirect
 	github.com/kennygrant/sanitize v1.2.4 // indirect
 	github.com/robertkrimen/otto v0.2.1 // indirect
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect

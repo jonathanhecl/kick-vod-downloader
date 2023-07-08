@@ -11,7 +11,7 @@ import (
 	cloudflarebp "github.com/DaRealFreak/cloudflare-bp-go"
 )
 
-type KickResponse struct {
+type KickMetadataResponse struct {
 	Source     string `json:"source"`
 	Livestream struct {
 		SessionTitle string `json:"session_title"`
@@ -28,8 +28,8 @@ func extractVideoID(url string) string {
 	return matches[1]
 }
 
-func getMetadataFromKickURL(videoID string) (KickResponse, error) {
-	var res = KickResponse{}
+func getMetadataFromKickURL(videoID string) (KickMetadataResponse, error) {
+	var res = KickMetadataResponse{}
 	url := fmt.Sprintf("https://kick.com/api/v1/video/%s", videoID)
 
 	client := &http.Client{}
@@ -48,7 +48,7 @@ func getMetadataFromKickURL(videoID string) (KickResponse, error) {
 
 	err = json.Unmarshal(body, &res)
 	if err != nil {
-		return KickResponse{}, err
+		return KickMetadataResponse{}, err
 	}
 
 	return res, nil

@@ -6,8 +6,11 @@ This is a tool to download the VOD from kick.com
 
 _TODO list:_
 
-- [x] Get the m3u8 file from kick (cloudflare)
-- [ ] Download the m3u8 file
+- [x] Get the m3u8 file from kick
+- [x] Parse M3U8 Master Playlist
+- [x] Parse M3U8 Video Playlist
+- [x] Download the video segments
+- [ ] Merge the video segments
 
 ---
 
