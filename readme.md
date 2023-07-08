@@ -17,6 +17,7 @@ _TODO list:_
 2. Run the project with the kick url as the first argument
 
 __Or__
+
 3. Enter the kick url like https://www.kick.com/video/d5843b1c-70d8-426c-bdaf-d69e6d90b80c in the console
 
 
