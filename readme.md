@@ -37,7 +37,7 @@ __Or__
 
 ## How to build
 
-> go build -o kick-vod-downloader.exe
+> go build -o .
 > 
 
 ---
