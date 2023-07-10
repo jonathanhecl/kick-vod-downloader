@@ -1,6 +1,6 @@
 module github.com/jonathanhecl/kick-vod-downloader
 
-go 1.20
+go 1.19
 
 require (
 	github.com/DaRealFreak/cloudflare-bp-go v1.0.4
