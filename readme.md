@@ -11,6 +11,12 @@ Requirements:
 
 ---
 
+Features:
+
+- Download the VOD from kick.com
+- Convert the VOD to mp4
+___
+
 _TODO list:_
 
 - [x] Get the m3u8 file from kick
