@@ -1,3 +1,4 @@
+![Image](kvd-logo.png)
 ## KVD ~ Kick VOD Downloader
 
 This is a tool to download the VOD from kick.com
