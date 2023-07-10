@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"github.com/jonathanhecl/gotimeleft"
 	"os"
+	"os/exec"
 )
 
 var (
-	version = "0.1.5"
+	version = "0.1.6"
 )
 
 func main() {
@@ -18,6 +19,13 @@ func main() {
 
 	fmt.Println("This tool is for educational purpose only.")
 	fmt.Println("Do not use this tool to download videos without permission from the owner.")
+
+	_, err := exec.LookPath("ffmpeg")
+	if err != nil {
+		fmt.Println()
+		fmt.Println("WARNING! FFmpeg is not detected. Please install FFmpeg first. https://ffmpeg.org/download.html")
+		fmt.Println("	FFmpeg is required to convert video to MP4 format. If you don't want to convert video, you can skip this warning.")
+	}
 
 	var url string
 	if len(os.Args) == 2 {
