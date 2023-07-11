@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"regexp"
+	"time"
 
 	cloudflarebp "github.com/DaRealFreak/cloudflare-bp-go"
 )
@@ -29,25 +31,29 @@ func extractVideoID(url string) string {
 
 func getMetadataFromKickURL(videoID string) (KickMetadataResponse, error) {
 	var res = KickMetadataResponse{}
-	url := fmt.Sprintf("https://kick.com/api/v1/video/%s", videoID)
+	url := fmt.Sprintf("https://kick.com/api/v1/video/%s?%d", videoID, time.Now().Unix())
 
 	client := &http.Client{}
 	client.Transport = cloudflarebp.AddCloudFlareByPass(client.Transport)
 
 	rep, err := client.Get(url)
 	if err != nil {
-		return KickMetadataResponse{}, err
+		return KickMetadataResponse{}, errors.New("client.Get: " + err.Error())
 	}
 
 	body, err := io.ReadAll(rep.Body)
-	rep.Body.Close()
+	defer rep.Body.Close()
 	if err != nil {
-		return KickMetadataResponse{}, err
+		return KickMetadataResponse{}, errors.New("io.ReadAll: " + err.Error())
+	}
+
+	if rep.StatusCode == 403 { // Cloudflare
+		return KickMetadataResponse{}, errors.New("StatusCode: Cloudflare bypass failed")
 	}
 
 	err = json.Unmarshal(body, &res)
 	if err != nil {
-		return KickMetadataResponse{}, err
+		return KickMetadataResponse{}, errors.New("json.Unmarshal: " + err.Error())
 	}
 
 	return res, nil

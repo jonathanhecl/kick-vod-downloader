@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	version = "0.1.6"
+	version = "0.1.7"
 )
 
 func main() {
@@ -51,7 +51,7 @@ func main() {
 
 	metadata, err := getMetadataFromKickURL(videoID)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("getMetadataFromKickURL: ", err)
 		return
 	}
 
@@ -63,7 +63,7 @@ func main() {
 
 	err = downloadSegments(metadata)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("downloadSegments: ", err)
 		return
 	}
 
@@ -71,7 +71,7 @@ func main() {
 
 	err = mergeSegments(metadata.Livestream.Slug)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("mergeSegments: ", err)
 		return
 	}
 
@@ -79,7 +79,7 @@ func main() {
 
 	err = convertVideo(metadata.Livestream.Slug)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("convertVideo: ", err)
 		return
 	}
 
